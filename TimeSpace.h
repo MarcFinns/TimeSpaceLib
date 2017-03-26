@@ -10,13 +10,17 @@ class Timezone : public JsonListener, public WsClient
   public:
     Timezone()
     {
-      // Serial.println("Timezone constructor");
+#ifdef DEBUG_LOG
+      Serial.println("Timezone constructor");
+#endif
       hostName = FPSTR(timeZoneHost);
     };
 
     ~Timezone()
     {
-      // Serial.println("Timezone destructor");
+#ifdef DEBUG_LOG
+      Serial.println("Timezone destructor");
+#endif
     };
 
     bool acquire(double latitude, double longitude);
@@ -31,13 +35,13 @@ class Timezone : public JsonListener, public WsClient
     virtual void startObject();
     String getTimeZoneId();
     String getTimeZoneName();
-    int getDstOffset();
+    bool isDst();
     int getUtcOffset();
 
   private:
     String currentKey;
     String currentParent;
-    int dstOffset;
+    bool dst;
     int utcOffset;
     String timeZoneId;
     String timeZoneName;
@@ -47,11 +51,15 @@ class Geolocate : public JsonListener, public WsClient
 {
   public:
     Geolocate() {
-      // Serial.println("Geolocate constructor");
+#ifdef DEBUG_LOG
+      Serial.println("Geolocate constructor");
+#endif
       hostName = FPSTR(geoLocateHost);
     };
     ~Geolocate() {
-      // Serial.println("Geolocate destructor");
+#ifdef DEBUG_LOG
+      Serial.println("Geolocate destructor");
+#endif
     };
 
     bool acquire();
@@ -81,11 +89,15 @@ class Geocode : public JsonListener, public WsClient
 {
   public:
     Geocode() {
-      // Serial.println("Geocode constructor");
+#ifdef DEBUG_LOG
+      Serial.println("Geocode constructor");
+#endif
       hostName = FPSTR(geoCodeHost);
     };
     ~Geocode() {
-      // Serial.println("Geocode destructor");
+#ifdef DEBUG_LOG
+      Serial.println("Geocode destructor");
+#endif
     };
 
     bool acquire(double latitude, double longitude);

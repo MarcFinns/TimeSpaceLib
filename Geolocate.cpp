@@ -52,8 +52,9 @@ bool Geolocate::acquire()
     }
     multiAPString += WiFi.BSSIDstr(i) + "," + WiFi.RSSI(i);
   }
-
-  // Serial.println(multiAPString);
+#ifdef DEBUG_LOG
+  Serial.println(multiAPString);
+#endif
 
   // Base64-encode the AP string..
   char multiAPs[multiAPString.length() + 1];
@@ -62,7 +63,9 @@ bool Geolocate::acquire()
 
   String url = FPSTR(geoLocateURL);
   url += multiAPString;
-  // Serial.println("URL = " + url);
+#ifdef DEBUG_LOG
+  Serial.println("URL = " + url);
+#endif
 
   //Connect to the client and make the api call
   if (httpConnect())
@@ -89,27 +92,37 @@ bool Geolocate::acquire()
       while ((size = client.available()) > 0)
       {
         c = client.read();
-        // Serial.print(c);
+#ifdef DEBUG_LOG
+        Serial.print(c);
+#endif
         parser.parse(c);
       }
     }
     else
     {
       // Get failed
-      // Serial.println("get failed");
+#ifdef DEBUG_LOG
+      Serial.println("get failed");
+#endif
       return false;
     }
   }
   else
   {
     // Could not connect
-    // Serial.println("Could not connect");
+#ifdef DEBUG_LOG
+    Serial.println("Could not connect");
+#endif
     return false;
+
   }
 
   disconnect();
 
-  return true;
+  if (latitude == 0 || longitude == 0)
+    return false;
+  else
+    return true;
 }
 
 void Geolocate::key(String key) {
@@ -118,12 +131,6 @@ void Geolocate::key(String key) {
 
 void Geolocate::value(String value)
 {
-  /*
-    if (currentKey == "result")
-    {
-    result_ = value;
-    }
-  */
   if (currentKey == "lat")
   {
     latitude = value.toFloat();
@@ -132,8 +139,9 @@ void Geolocate::value(String value)
   {
     longitude = value.toFloat();
   }
-
-  // Serial.println("Key " + currentKey + ", value: " + value);
+#ifdef DEBUG_LOG
+  Serial.println("Key " + currentKey + ", value: " + value);
+#endif
 }
 
 double Geolocate::getLongitude() {

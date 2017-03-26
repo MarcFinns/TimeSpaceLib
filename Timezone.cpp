@@ -26,7 +26,9 @@ bool Timezone::acquire(double latitude, double longitude)
     url += F("&key=") ;
     url += FPSTR(timeZoneKey);
 
-    // Serial.println("URL = " + url);
+#ifdef DEBUG_LOG
+    Serial.println("URL = " + url);
+#endif
 
     if (httpGet(url) && skipResponseHeaders())
     {
@@ -46,25 +48,31 @@ bool Timezone::acquire(double latitude, double longitude)
           return false;
         }
       }
-      
+
       while ((size = client.available()) > 0)
       {
         c = client.read();
-        // Serial.print(c);
+#ifdef DEBUG_LOG
+        Serial.print(c);
+#endif
         parser.parse(c);
       }
     }
     else
     {
       // Get failed
-      // Serial.println("get failed");
+#ifdef DEBUG_LOG
+      Serial.println("get failed");
+#endif
       return false;
     }
   }
   else
   {
     // Could not connect
-    // Serial.println("Could not connect");
+#ifdef DEBUG_LOG
+    Serial.println("Could not connect");
+#endif
     return false;
   }
 
@@ -74,25 +82,33 @@ bool Timezone::acquire(double latitude, double longitude)
 }
 
 void Timezone::whitespace(char c) {
-  // Serial.println("whitespace");
+#ifdef DEBUG_LOG
+  Serial.println("whitespace");
+#endif
 }
 
 void Timezone::startDocument() {
-  // Serial.println("start document");
+#ifdef DEBUG_LOG
+  Serial.println("start document");
+#endif
 }
 
 
 void Timezone::key(String key) {
-  // Serial.println("key: " + key);
+#ifdef DEBUG_LOG
+  Serial.println("key: " + key);
+#endif
   currentKey = String(key);
 }
 
 void Timezone::value(String value)
 {
-  // Serial.println("value: " + value);
+#ifdef DEBUG_LOG
+  Serial.println("value: " + value);
+#endif
   if (currentKey == F("dst"))
   {
-    dstOffset = value.toInt();
+    dst = value.toInt();
   }
   else if (currentKey == F("gmtOffset"))
   {
@@ -109,23 +125,33 @@ void Timezone::value(String value)
 }
 
 void Timezone::endArray() {
-  // Serial.println("end array. ");
+#ifdef DEBUG_LOG
+  Serial.println("end array. ");
+#endif
 }
 
 void Timezone::endObject() {
-  // Serial.println("end object. ");
+#ifdef DEBUG_LOG
+  Serial.println("end object. ");
+#endif
 }
 
 void Timezone::endDocument() {
-  // Serial.println("end document. ");
+#ifdef DEBUG_LOG
+  Serial.println("end document. ");
+#endif
 }
 
 void Timezone::startArray() {
-  // Serial.println("start array. ");
+#ifdef DEBUG_LOG
+  Serial.println("start array. ");
+#endif
 }
 
 void Timezone::startObject() {
-  // Serial.println("start object. ");
+#ifdef DEBUG_LOG
+  Serial.println("start object. ");
+#endif
 }
 
 String Timezone::getTimeZoneId()
@@ -138,9 +164,9 @@ String Timezone::getTimeZoneName()
   return timeZoneName;
 }
 
-int Timezone::getDstOffset()
+bool Timezone::isDst()
 {
-  return dstOffset;
+  return dst;
 }
 
 int Timezone::getUtcOffset()

@@ -10,10 +10,14 @@ bool WsClient::skipResponseHeaders()
   while (client.connected())
   {
     String line = client.readStringUntil('\n');
-    // Serial.println("HEADERS: " + line);
+#ifdef DEBUG_LOG
+    Serial.println("HEADERS: " + line);
+#endif
     if (line == "\r")
     {
-      // Serial.println(F("headers received"));
+#ifdef DEBUG_LOG
+      Serial.println(F("headers received"));
+#endif
       outcome = true;
       break;
     }
@@ -49,7 +53,9 @@ bool WsClient::httpGet(String url)
 // Close the connection with the HTTP server
 void WsClient::disconnect()
 {
-  // Serial.println(F("Disconnect"));
+#ifdef DEBUG_LOG
+  Serial.println(F("Disconnect"));
+#endif
   client.stop();
 }
 

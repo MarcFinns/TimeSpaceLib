@@ -7,14 +7,18 @@ class WsClient
   public:
     WsClient()
     {
-      // Serial.println("WsClient constructor");
+#ifdef DEBUG_LOG
+      Serial.println("WsClient constructor");
+#endif
     };
 
     ~WsClient()
     {
-      // Serial.println("WsClient destructor");
+#ifdef DEBUG_LOG
+      Serial.println("WsClient destructor");
+#endif
     };
-    
+
   public:
     String hostName;
     bool httpConnect();

@@ -30,7 +30,7 @@ bool Geocode::acquire(double latitude, double longitude)
 
     if (httpGet(url) && skipResponseHeaders())
     {
-      // Invalidate current values 
+      // Invalidate current values
       locality = FPSTR(empty);
       country = FPSTR(empty);
       countryCode = FPSTR(empty);
@@ -72,26 +72,37 @@ bool Geocode::acquire(double latitude, double longitude)
 
   disconnect();
 
-  return true;
+  if (country == "" || countryCode == "")
+    return false;
+  else
+    return true;
 }
 
 void Geocode::whitespace(char c) {
-  // Serial.println("whitespace");
+#ifdef DEBUG_LOG
+  Serial.println("whitespace");
+#endif
 }
 
 void Geocode::startDocument() {
-  //   // Serial.println("start document");
+#ifdef DEBUG_LOG
+  Serial.println("start document");
+#endif
 }
 
 void Geocode::key(String key)
 {
-  // Serial.println("key: " + key);
+#ifdef DEBUG_LOG
+  Serial.println("key: " + key);
+#endif
   currentKey = key;
 }
 
 void Geocode::value(String value)
 {
-  // Serial.println("value: " + value);
+#ifdef DEBUG_LOG
+  Serial.println("value: " + value);
+#endif
   if (currentKey == F("name"))
   {
     locality = value;
@@ -108,23 +119,33 @@ void Geocode::value(String value)
 
 
 void Geocode::endArray() {
-  // Serial.println("end array. ");
+#ifdef DEBUG_LOG
+  Serial.println("end array. ");
+#endif
 }
 
 void Geocode::endObject() {
-  //   // Serial.println("end object. ");
+#ifdef DEBUG_LOG
+  Serial.println("end object. ");
+#endif
 }
 
 void Geocode::endDocument() {
-  //   // Serial.println("end document. ");
+#ifdef DEBUG_LOG
+  Serial.println("end document. ");
+#endif
 }
 
 void Geocode::startArray() {
-  //   // Serial.println("start array. ");
+#ifdef DEBUG_LOG
+  Serial.println("start array. ");
+#endif
 }
 
 void Geocode::startObject() {
-  //   // Serial.println("start object. ");
+#ifdef DEBUG_LOG
+  Serial.println("start object. ");
+#endif
 }
 
 String Geocode::getLocality()
