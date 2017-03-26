@@ -1,6 +1,5 @@
 #include <NtpClientLib.h>         // http://github.com/gmag11/NtpClient
 #include <ESP8266WiFi.h>
-
 #include "TimeSpace.h"
 
 // Wifi
@@ -13,7 +12,7 @@ const char PROGMEM ntpServerName[] = "pool.ntp.org";
 // Values acquired from web services
 double latitude;
 double longitude;
-int dstOffset;
+bool dst;
 int utcOffset;
 String timeZoneId;
 String timeZoneName;
@@ -58,7 +57,7 @@ void loop()
 
   Serial.println( "======== TIME ZONE ==================");
   Serial.println( "UTC Offset = " + String(utcOffset));
-  Serial.println( "DST offset = " + String(dstOffset));
+  Serial.println( "DST = " + String(dst));
   Serial.println( "Time Zone ID = " + timeZoneId);
   Serial.println( "Time Zone Name = " + timeZoneName);
 
@@ -104,8 +103,9 @@ void initNTP()
 
   // Get NTP time according to local time zone / DST
   Serial.println("4 ------- Sincronising time via NTP on local time zone...");
-  //NTP.stop();
-  NTP.begin(FPSTR(ntpServerName), utcOffset / 3600, dstOffset != 0);
+  
+  // NOTE: UTCOffset already contains DST offset!
+  NTP.begin(FPSTR(ntpServerName), utcOffset / (3600 * (1 + dst)), dst);
   NTP.setInterval(5, 1800);
 
   // Wait until NTP time is synchronised
@@ -142,7 +142,7 @@ void initTimeSpace()
 
   // Save variables
   utcOffset = timezone.getUtcOffset();
-  dstOffset = timezone.getDstOffset();
+  dst = timezone.isDst();
   timeZoneId = timezone.getTimeZoneId();
   timeZoneName = timezone.getTimeZoneName();
 
