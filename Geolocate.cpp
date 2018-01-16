@@ -33,6 +33,8 @@
 #include "TimeSpace.h"
 #include "UserConfig.h"
 
+// #include <Syslog.h>
+// extern Syslog syslog;
 
 /**********************************************************
   Step 1 - Geolocation
@@ -48,11 +50,12 @@ bool Geolocate::acquire()
   {
     if (i > 0)
     {
-      multiAPString += ",";
+      multiAPString += ";";
     }
     multiAPString += WiFi.BSSIDstr(i) + "," + WiFi.RSSI(i);
   }
-#ifdef DEBUG_LOG
+  //multiAPString= "F0:9F:C2:37:CB:B1,-73;F0:9F:C2:A1:18:51,-93;F6:9F:C2:37:CB:B1,-74;F6:9F:C2:A1:18:51,-91;C0:3F:0E:78:40:15,-82;F6:9F:C2:37:C4:86,-90;F0:9F:C2:37:CF:03,-86;F6:9F:C2:37:CF:03,-85;C6:3F:0E:78:40:15,-87;C0:3F:0E:7A:8F:87,-92;C2:3F:0E:78:40:15,-83";
+#ifdef DEBUG_SERIAL
   Serial.println(multiAPString);
 #endif
 
@@ -63,9 +66,13 @@ bool Geolocate::acquire()
 
   String url = FPSTR(geoLocateURL);
   url += multiAPString;
-#ifdef DEBUG_LOG
+
+#ifdef DEBUG_SERIAL
   Serial.println("URL = " + url);
 #endif
+
+  // syslog.log(LOG_INFO, "URL = " + url);
+  // String myBuffer;
 
   //Connect to the client and make the api call
   if (httpConnect())
@@ -75,7 +82,6 @@ bool Geolocate::acquire()
       JsonStreamingParser parser;
       parser.setListener(this);
       char c;
-      int size = 0;
 
       // Allow for slow server...
       int retryCounter = 0;
@@ -89,19 +95,23 @@ bool Geolocate::acquire()
         }
       }
 
-      while ((size = client.available()) > 0)
+      while (client.available())
       {
         c = client.read();
-#ifdef DEBUG_LOG
+#ifdef DEBUG_SERIAL
         Serial.print(c);
 #endif
         parser.parse(c);
+        //       myBuffer = myBuffer + String(c);
+
+        // Improves reliability from ESP version 2.4.0
+        yield();
       }
     }
     else
     {
       // Get failed
-#ifdef DEBUG_LOG
+#ifdef DEBUG_SERIAL
       Serial.println("get failed");
 #endif
       return false;
@@ -110,7 +120,7 @@ bool Geolocate::acquire()
   else
   {
     // Could not connect
-#ifdef DEBUG_LOG
+#ifdef DEBUG_SERIAL
     Serial.println("Could not connect");
 #endif
     return false;
@@ -118,6 +128,8 @@ bool Geolocate::acquire()
   }
 
   disconnect();
+
+  //syslog.log(LOG_INFO, "RESPONDE = " + myBuffer);
 
   if (latitude == 0 || longitude == 0)
     return false;
@@ -139,7 +151,7 @@ void Geolocate::value(String value)
   {
     longitude = value.toFloat();
   }
-#ifdef DEBUG_LOG
+#ifdef DEBUG_SERIAL
   Serial.println("Key " + currentKey + ", value: " + value);
 #endif
 }

@@ -1,6 +1,7 @@
 
 #include "Wsclient.h"
 
+
 const int httpPort = 80;
 
 // Skip HTTP headers so that we are at the beginning of the response's body
@@ -10,6 +11,7 @@ bool WsClient::skipResponseHeaders()
   while (client.connected())
   {
     String line = client.readStringUntil('\n');
+
 #ifdef DEBUG_LOG
     Serial.println("HEADERS: " + line);
 #endif

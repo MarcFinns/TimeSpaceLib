@@ -52,13 +52,18 @@ bool Geocode::acquire(double latitude, double longitude)
         JsonStreamingParser parser;
         parser.setListener(this);
         char c;
-        int size = 0;
 
-        while ((size = client.available()) > 0)
+        while (client.available())
         {
           c = client.read();
-          // Serial.print(c);
+
+#ifdef DEBUG_SERIAL
+          Serial.print(c);
+#endif
           parser.parse(c);
+
+          // Improves reliability from ESP version 2.4.0
+          yield();
         }
       }
     }

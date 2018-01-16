@@ -4,8 +4,6 @@
 #include "TimeSpace.h"
 #include "UserConfig.h"
 
-//extern NTPClient NTP;
-
 
 bool Timezone::acquire(double latitude, double longitude)
 {
@@ -35,7 +33,6 @@ bool Timezone::acquire(double latitude, double longitude)
       JsonStreamingParser parser;
       parser.setListener(this);
       char c;
-      int size = 0;
 
       // Allow for slow server...
       int retryCounter = 0;
@@ -49,13 +46,17 @@ bool Timezone::acquire(double latitude, double longitude)
         }
       }
 
-      while ((size = client.available()) > 0)
+      while (client.available())
       {
         c = client.read();
+
 #ifdef DEBUG_LOG
         Serial.print(c);
 #endif
         parser.parse(c);
+
+        // Improves reliability from ESP version 2.4.0
+        yield();
       }
     }
     else
